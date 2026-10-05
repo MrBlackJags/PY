@@ -1,156 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Echoes of the Wild — Extinct Animals Explorer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <!-- Navigation -->
-  <header>
-    <div class="nav-container">
-      <a href="index.html" class="logo">
-        <div class="logo-badge">&Chi;</div>
-        <span>Echoes of the Wild</span>
-      </a>
-      <nav>
-        <ul>
-          <li><a href="index.html" class="active">Animals Explorer</a></li>
-          <li><a href="timeline.html">Extinction Timeline</a></li>
-          <li><a href="quiz.html">Interactive Quiz</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <span class="hero-tag">Natural History & Conservation</span>
-      <h1>Discover The Creatures <span>Lost To History</span></h1>
-      <p>From ice age titans to birds that darkened the sky, uncover the stories, biology, and critical ecological lessons behind Earth's extinct wildlife.</p>
-      
-      <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-number">9+</div>
-          <div class="stat-label">Featured Species</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">3</div>
-          <div class="stat-label">Historical Epochs</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Lessons For Today</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Explorer -->
-  <main>
-    <section class="controls-section">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search by name, scientific name, habitat..." />
-      </div>
-
-      <div class="filter-pills">
-        <button class="filter-btn active" data-category="all">All Creatures</button>
-        <button class="filter-btn" data-category="ice-age">Ice Age (Pleistocene)</button>
-        <button class="filter-btn" data-category="historical">Historical (1600s–1700s)</button>
-        <button class="filter-btn" data-category="modern">Modern Era (1800s–1900s)</button>
-      </div>
-    </section>
-
-    <!-- Cards Grid -->
-    <section class="cards-grid" id="animalsGrid">
-      <!-- Populated dynamically by script.js -->
-    </section>
-  </main>
-
-  <!-- Detailed Modal Dossier -->
-  <div class="modal-overlay" id="dossierModal" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <div class="modal-header">
-        <img id="modalImg" src="" alt="Animal preview">
-        <button class="modal-close" onclick="closeDossier()" aria-label="Close details">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-title-wrap">
-          <h2 class="modal-title" id="modalTitle"></h2>
-          <div class="modal-scientific" id="modalScientific"></div>
-        </div>
-
-        <div class="dossier-grid">
-          <div class="dossier-item">
-            <div class="dossier-label">Extinction Period</div>
-            <div class="dossier-val" id="modalExtinct"></div>
-          </div>
-          <div class="dossier-item">
-            <div class="dossier-label">Native Habitat</div>
-            <div class="dossier-val" id="modalHabitat"></div>
-          </div>
-          <div class="dossier-item">
-            <div class="dossier-label">Diet</div>
-            <div class="dossier-val" id="modalDiet"></div>
-          </div>
-          <div class="dossier-item">
-            <div class="dossier-label">Size & Stature</div>
-            <div class="dossier-val" id="modalSize"></div>
-          </div>
-        </div>
-
-        <div class="dossier-section">
-          <h4>⚠️ Primary Causes of Extinction</h4>
-          <p id="modalCauses"></p>
-        </div>
-
-        <div class="dossier-section">
-          <h4>💡 Fascinating Fact</h4>
-          <p id="modalFact"></p>
-        </div>
-
-        <div class="dossier-section">
-          <h4>🌱 What Conservation Can Learn</h4>
-          <p id="modalLesson"></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-container">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <h3 style="font-family: var(--font-heading); color: #fff;">Echoes of the Wild</h3>
-          <p>An educational resource dedicated to remembering lost species and advocating for modern wildlife preservation.</p>
-        </div>
-        <div>
-          <h4 style="color: var(--accent-amber-light); margin-bottom: 0.75rem;">Navigation</h4>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
-            <li><a href="index.html" style="color: var(--text-secondary); text-decoration: none;">Species Explorer</a></li>
-            <li><a href="timeline.html" style="color: var(--text-secondary); text-decoration: none;">Extinction Timeline</a></li>
-            <li><a href="quiz.html" style="color: var(--text-secondary); text-decoration: none;">Interactive Quiz</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 style="color: var(--accent-amber-light); margin-bottom: 0.75rem;">Take Action</h4>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 280px;">Support global biodiversity initiatives like the IUCN Red List and local wildlife reserves.</p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        &copy; 2026 Echoes of the Wild — In memory of the species that once walked beside us.
-      </div>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌋</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRIMORDIA — The Chronicles of Deep Time</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="./assets/index-DMsHZcfE.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Cq-BhoKc.css">
+  </head>
+  <body class="bg-black text-slate-100 antialiased selection:bg-orange-500/30 selection:text-orange-200">
+    <div id="root"></div>
+  </body>
 </html>
