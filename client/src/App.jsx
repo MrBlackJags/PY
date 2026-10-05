@@ -7,13 +7,12 @@ import {
   Scale, 
   ArrowUpRight, 
   Search, 
-  Database,
-  Shuffle,
-  Compass,
-  MapPin,
-  Bone,
-  Eye
+  Database, 
+  Shuffle, 
+  ArrowLeft,
+  Compass
 } from 'lucide-react';
+import LandingPage from './components/LandingPage';
 import ParticleBackground from './components/ParticleBackground';
 import Soundscape from './components/Soundscape';
 import CreatureModal from './components/CreatureModal';
@@ -22,6 +21,11 @@ import SceneryViewer from './components/SceneryViewer';
 import { SCENERIES, INITIAL_CREATURES } from './data/primordialData';
 
 export default function App() {
+  // Navigation State: 'landing' or 'discoveries'
+  const [currentView, setCurrentView] = useState(() => {
+    return window.location.hash === '#discoveries' ? 'discoveries' : 'landing';
+  });
+
   const [realm, setRealm] = useState('land'); // 'land', 'ocean', 'air'
   const [era, setEra] = useState('all'); // 'all', 'Paleozoic', 'Mesozoic', 'Cenozoic'
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,8 +36,35 @@ export default function App() {
   const [selectedCreatureId, setSelectedCreatureId] = useState(null);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
-  // Fetch creatures from backend with fallback
+  // Sync hash with currentView
+  const navigateToDiscoveries = () => {
+    setCurrentView('discoveries');
+    window.location.hash = 'discoveries';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToLanding = () => {
+    setCurrentView('landing');
+    window.location.hash = '';
+  };
+
+  // Listen for hash changes
   useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#discoveries') {
+        setCurrentView('discoveries');
+      } else {
+        setCurrentView('landing');
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  // Fetch creatures from backend with robust fallback
+  useEffect(() => {
+    if (currentView !== 'discoveries') return;
+
     setLoading(true);
     const params = new URLSearchParams();
     if (realm) params.append('realm', realm);
@@ -46,7 +77,7 @@ export default function App() {
         if (data.success && data.data && data.data.length > 0) {
           setCreatures(data.data);
         } else {
-          // Client-side fallback filter
+          // Client-side fallback
           const filtered = INITIAL_CREATURES.filter(c => {
             const matchesRealm = c.realm === realm;
             const matchesEra = era === 'all' || c.geological_era === era;
@@ -60,7 +91,7 @@ export default function App() {
         }
       })
       .catch(() => {
-        // Fallback filter when server is unreachable
+        // Fallback filter
         const filtered = INITIAL_CREATURES.filter(c => {
           const matchesRealm = c.realm === realm;
           const matchesEra = era === 'all' || c.geological_era === era;
@@ -73,16 +104,14 @@ export default function App() {
         setCreatures(filtered);
       })
       .finally(() => setLoading(false));
-  }, [realm, era, searchQuery]);
+  }, [realm, era, searchQuery, currentView]);
 
-  // Fetch all creatures for compare and global stats
+  // Initial stats
   useEffect(() => {
     fetch('/api/creatures')
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && data.data) {
-          setAllCreatures(data.data);
-        }
+        if (data.success && data.data) setAllCreatures(data.data);
       })
       .catch(() => {});
 
@@ -95,23 +124,12 @@ export default function App() {
   }, []);
 
   const handleRandomDiscovery = () => {
-    fetch('/api/random')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.data) {
-          setRealm(data.data.realm);
-          setSelectedCreatureId(data.data.id);
-        } else {
-          const rand = INITIAL_CREATURES[Math.floor(Math.random() * INITIAL_CREATURES.length)];
-          setRealm(rand.realm);
-          setSelectedCreatureId(rand.id);
-        }
-      })
-      .catch(() => {
-        const rand = INITIAL_CREATURES[Math.floor(Math.random() * INITIAL_CREATURES.length)];
-        setRealm(rand.realm);
-        setSelectedCreatureId(rand.id);
-      });
+    const pool = allCreatures.length > 0 ? allCreatures : INITIAL_CREATURES;
+    const rand = pool[Math.floor(Math.random() * pool.length)];
+    if (rand) {
+      setRealm(rand.realm);
+      setSelectedCreatureId(rand.id);
+    }
   };
 
   const currentScenery = SCENERIES[realm] || SCENERIES.land;
@@ -144,6 +162,12 @@ export default function App() {
     },
   }[realm];
 
+  // 1. Separate Fullscreen Landing Page View (1 random scenery, no extra buttons)
+  if (currentView === 'landing') {
+    return <LandingPage onEnter={navigateToDiscoveries} />;
+  }
+
+  // 2. Main Prehistoric Discoveries Page View
   return (
     <div className="min-h-screen text-slate-100 bg-black font-sans relative selection:bg-white/20 selection:text-white transition-colors duration-700 overflow-x-hidden">
       {/* Ambient Particle Mist */}
@@ -157,21 +181,26 @@ export default function App() {
         }}
       />
 
-      {/* Floating Minimal Navigation Bar */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-black/65 border-b border-white/10">
+      {/* Floating Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-black/75 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           
-          {/* Logo */}
+          {/* Logo & Return to Landing */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center font-serif font-black text-sm text-white shadow-inner">
-              &Omega;
-            </div>
-            <div>
+            <button
+              onClick={navigateToLanding}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-300 hover:text-white transition-colors"
+              title="Return to fullscreen landing vista"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">VISTA</span>
+            </button>
+            <div className="border-l border-zinc-800 pl-3">
               <span className="font-serif font-bold tracking-widest text-base text-white">
                 PRIMORDIA
               </span>
-              <span className="hidden sm:inline-block ml-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500 border-l border-zinc-800 pl-2">
-                Deep Time Sceneries
+              <span className="hidden md:inline-block ml-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                DISCOVERIES
               </span>
             </div>
           </div>
@@ -215,7 +244,7 @@ export default function App() {
             </button>
           </div>
 
-          {/* Minimal Controls */}
+          {/* Ambient Soundscape & Random Discovery */}
           <div className="flex items-center gap-2">
             <Soundscape realm={realm} />
 
@@ -230,30 +259,30 @@ export default function App() {
         </div>
       </header>
 
-      {/* Hero Header */}
-      <section className="relative z-10 pt-10 sm:pt-16 pb-4 px-4 sm:px-6 max-w-5xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono tracking-widest uppercase border bg-black/40 backdrop-blur-md mb-4 border-white/10 text-zinc-400">
+      {/* Main Discoveries Viewport */}
+      <section className="relative z-10 pt-8 pb-3 px-4 sm:px-6 max-w-5xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono tracking-widest uppercase border bg-black/40 backdrop-blur-md mb-3 border-white/10 text-zinc-400">
           <Sparkles className="w-3 h-3 text-amber-400" />
           <span>{themeStyles.tag}</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-serif font-black tracking-tight text-white uppercase leading-[1.1] mb-3">
-          Witness Earth's <span className={`bg-gradient-to-r ${themeStyles.titleHighlight} bg-clip-text text-transparent`}>Lost Worlds</span>
+        <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight text-white uppercase leading-tight mb-2">
+          Territories of <span className={`bg-gradient-to-r ${themeStyles.titleHighlight} bg-clip-text text-transparent`}>{currentScenery.name}</span>
         </h1>
 
-        <p className="max-w-2xl mx-auto text-xs sm:text-sm text-zinc-400 font-sans leading-relaxed mb-6">
-          Immerse yourself in authentic primordial sceneries and habitats. Click interactive hotspots on the panoramic landscape to uncover the extinct giants that ruled each territory.
+        <p className="max-w-2xl mx-auto text-xs sm:text-sm text-zinc-400 font-sans leading-relaxed">
+          Explore realistic panoramic habitats. Click any pulsing territory pin on the scenery to examine fossil records and paleobiology.
         </p>
       </section>
 
-      {/* Vast Realistic Scenery Viewport */}
+      {/* Full Realistic Panoramic Scenery Viewport with Working Hotspots */}
       <SceneryViewer
         scenery={currentScenery}
         onSelectCreature={(id) => setSelectedCreatureId(id)}
         realmTheme={realm}
       />
 
-      {/* Interactive Controls & Filters */}
+      {/* Filter and Search Bar */}
       <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-950/80 border border-white/10 backdrop-blur-xl">
           {/* Search Box */}

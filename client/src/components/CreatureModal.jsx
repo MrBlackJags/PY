@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShieldAlert, Clock, MapPin, Bone, Activity, Send, CheckCircle2 } from 'lucide-react';
+import { INITIAL_CREATURES } from '../data/primordialData';
 
 export default function CreatureModal({ creatureId, onClose, realmTheme }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const localMatch = INITIAL_CREATURES.find((c) => c.id === creatureId) || null;
+  const [data, setData] = useState(localMatch);
+  const [loading, setLoading] = useState(!localMatch);
   const [notes, setNotes] = useState([]);
   const [author, setAuthor] = useState('');
   const [newNote, setNewNote] = useState('');
@@ -12,16 +14,21 @@ export default function CreatureModal({ creatureId, onClose, realmTheme }) {
 
   useEffect(() => {
     if (!creatureId) return;
-    setLoading(true);
+    const initial = INITIAL_CREATURES.find((c) => c.id === creatureId) || null;
+    setData(initial);
+    setLoading(!initial);
+
     fetch(`/api/creatures/${creatureId}`)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success) {
+        if (res.success && res.data) {
           setData(res.data);
           setNotes(res.data.notes || []);
         }
       })
-      .catch((err) => console.error(err))
+      .catch((err) => {
+        // Fallback is already loaded
+      })
       .finally(() => setLoading(false));
   }, [creatureId]);
 

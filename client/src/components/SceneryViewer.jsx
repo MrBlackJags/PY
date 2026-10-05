@@ -91,27 +91,33 @@ export default function SceneryViewer({ scenery, onSelectCreature, realmTheme })
             <div
               key={spot.id}
               style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
-              className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSelectCreature(spot.creatureId);
+              }}
+              className="absolute z-30 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
             >
-              <button
-                onClick={() => onSelectCreature(spot.creatureId)}
+              <div
                 onMouseEnter={() => setActiveHotspot(spot.id)}
                 onMouseLeave={() => setActiveHotspot(null)}
-                className="group/spot relative flex items-center justify-center cursor-pointer transition-transform hover:scale-125 focus:outline-none"
+                className="group/spot relative flex items-center justify-center transition-transform hover:scale-125 focus:outline-none"
+                role="button"
+                tabIndex={0}
                 aria-label={`Explore ${spot.creatureName}`}
               >
                 {/* Ping rings */}
-                <span className="absolute w-10 h-10 rounded-full bg-white/20 animate-ping opacity-60 pointer-events-none" />
-                <span className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/80 backdrop-blur-md border border-white/40 shadow-xl flex items-center justify-center text-sm transition-colors group-hover/spot:border-white group-hover/spot:bg-zinc-800">
+                <span className="absolute w-12 h-12 rounded-full bg-white/20 animate-ping opacity-60 pointer-events-none" />
+                <span className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/85 backdrop-blur-md border border-white/40 shadow-xl flex items-center justify-center text-sm transition-all group-hover/spot:border-amber-400 group-hover/spot:bg-zinc-800">
                   {spot.icon}
                 </span>
 
                 {/* Popover Card on Hover/Focus */}
                 <div
-                  className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-3 rounded-xl bg-black/90 backdrop-blur-2xl border border-white/20 shadow-2xl text-left pointer-events-none transition-all duration-200 z-30 ${
+                  className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-3 rounded-xl bg-black/95 backdrop-blur-2xl border border-white/25 shadow-2xl text-left transition-all duration-200 z-40 ${
                     isSelected
-                      ? 'opacity-100 translate-y-0 scale-100'
-                      : 'opacity-0 translate-y-2 scale-95'
+                      ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                      : 'opacity-0 translate-y-2 scale-95 pointer-events-none'
                   }`}
                 >
                   <div className="text-[10px] font-mono uppercase tracking-wider text-amber-300 font-semibold mb-0.5">
@@ -120,11 +126,11 @@ export default function SceneryViewer({ scenery, onSelectCreature, realmTheme })
                   <div className="text-xs font-serif font-bold text-white mb-1">
                     {spot.creatureName}
                   </div>
-                  <div className="flex items-center gap-1 text-[10px] font-mono text-zinc-400">
+                  <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
                     <span>Click to examine specimen &rarr;</span>
                   </div>
                 </div>
-              </button>
+              </div>
             </div>
           );
         })}
