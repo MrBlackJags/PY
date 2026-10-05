@@ -1,0 +1,15 @@
+{
+  "name": "primordia",
+  "version": "1.0.0",
+  "description": "Vast & Primordial Extinct Creatures Web Platform with React, Tailwind, Shadcn UI patterns, and SQLite",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "cd client && npm run build",
+    "server": "cd server && node index.js",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
